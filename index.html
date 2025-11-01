@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AetherOS | Cloud Operating System</title>
+  <link rel="icon" type="image/png" href="images/aetheros-icon.png">
+  <style>
+    /* --- Base --- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+      user-select: none;
+    }
+    body {
+      background: radial-gradient(circle at top right, #0d0d18, #050510 80%);
+      color: white;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* --- Desktop --- */
+    .desktop {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .icon {
+      width: 80px;
+      text-align: center;
+      cursor: pointer;
+      margin: 20px;
+      display: inline-block;
+    }
+
+    .icon img {
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.1);
+      padding: 8px;
+      transition: transform 0.2s;
+    }
+
+    .icon:hover img {
+      transform: scale(1.1);
+    }
+
+    .icon span {
+      display: block;
+      margin-top: 5px;
+      font-size: 14px;
+      color: #ddd;
+    }
+
+    /* --- Windows --- */
+    .window {
+      position: absolute;
+      top: 100px;
+      left: 100px;
+      width: 700px;
+      height: 500px;
+      background: rgba(20, 20, 35, 0.95);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      resize: both;
+    }
+
+    .window-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255,255,255,0.05);
+      padding: 8px 12px;
+      cursor: move;
+    }
+
+    .window-header .title {
+      font-weight: bold;
+      color: #a6b8ff;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .close { background: #ff5f57; }
+    .minimize { background: #febc2e; }
+    .maximize { background: #28c840; }
+
+    .window-content {
+      flex: 1;
+      padding: 10px;
+      overflow: auto;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 0 0 12px 12px;
+    }
+
+    /* --- Browser --- */
+    .browser-bar {
+      background: rgba(255,255,255,0.1);
+      padding: 8px;
+      display: flex;
+      gap: 8px;
+      border-radius: 8px;
+    }
+
+    .browser-bar input {
+      flex: 1;
+      padding: 6px;
+      border: none;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.15);
+      color: white;
+      outline: none;
+    }
+
+    .browser-bar button {
+      background: #2f6bff;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+
+    /* --- Terminal --- */
+    .terminal {
+      font-family: monospace;
+      color: #00ff99;
+      background: #000;
+      padding: 10px;
+      height: 100%;
+      overflow-y: auto;
+      border-radius: 6px;
+    }
+
+    .terminal-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: #00ff99;
+      font-family: monospace;
+      outline: none;
+    }
+
+    /* --- Settings --- */
+    .settings {
+      color: #ddd;
+    }
+
+    .theme-toggle {
+      background: #2f6bff;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    /* --- Title --- */
+    .os-title {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 60px;
+      font-weight: 600;
+      background: linear-gradient(90deg, #00d4ff, #7b2ff7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px rgba(123,47,247,0.5);
+      animation: fadeIn 2s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translate(-50%, -40%); }
+      to { opacity: 1; transform: translate(-50%, -50%); }
+    }
+  </style>
+</head>
+<body>
+  <div class="desktop">
+    <div class="os-title">AetherOS</div>
+
+    <div class="icon" onclick="openWindow('browser')">
+      <img src="images/browser.png" alt="Browser">
+      <span>Browser</span>
+    </div>
+
+    <div class="icon" onclick="openWindow('terminal')">
+      <img src="images/terminal.png" alt="Terminal">
+      <span>Terminal</span>
+    </div>
+
+    <div class="icon" onclick="openWindow('settings')">
+      <img src="images/settings.png" alt="Settings">
+      <span>Settings</span>
+    </div>
+
+    <!-- Browser Window -->
+    <div id="browser" class="window">
+      <div class="window-header">
+        <div class="title">Aether Browser</div>
+        <div class="buttons">
+          <div class="btn close" onclick="closeWindow('browser')"></div>
+          <div class="btn minimize"></div>
+          <div class="btn maximize"></div>
+        </div>
+      </div>
+      <div class="window-content">
+        <div class="browser-bar">
+          <input type="text" id="urlInput" placeholder="Enter URL (e.g., https://example.com)">
+          <button onclick="navigate()">Go</button>
+          <button onclick="aetherUnblock()">Unblock</button>
+        </div>
+        <iframe id="browserFrame" src=""></iframe>
+      </div>
+    </div>
+
+    <!-- Terminal -->
+    <div id="terminal" class="window">
+      <div class="window-header">
+        <div class="title">Aether Terminal</div>
+        <div class="buttons">
+          <div class="btn close" onclick="closeWindow('terminal')"></div>
+        </div>
+      </div>
+      <div class="window-content">
+        <div class="terminal" id="terminalOutput">
+          <div>Welcome to AetherOS Terminal. Type 'help' for commands.</div>
+        </div>
+        <input type="text" class="terminal-input" id="terminalInput" placeholder=">_" onkeydown="handleCommand(event)">
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div id="settings" class="window">
+      <div class="window-header">
+        <div class="title">Settings</div>
+        <div class="buttons">
+          <div class="btn close" onclick="closeWindow('settings')"></div>
+        </div>
+      </div>
+      <div class="window-content settings">
+        <h3>Appearance</h3>
+        <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark/Light Mode</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Window System ---
+    function openWindow(id) {
+      document.getElementById(id).style.display = "flex";
+      bringToFront(id);
+    }
+
+    function closeWindow(id) {
+      document.getElementById(id).style.display = "none";
+    }
+
+    let zIndex = 10;
+    function bringToFront(id) {
+      const el = document.getElementById(id);
+      el.style.zIndex = ++zIndex;
+    }
+
+    // --- Dragging Windows ---
+    document.querySelectorAll('.window').forEach(win => {
+      const header = win.querySelector('.window-header');
+      header.onmousedown = function(e) {
+        bringToFront(win.id);
+        let shiftX = e.clientX - win.getBoundingClientRect().left;
+        let shiftY = e.clientY - win.getBoundingClientRect().top;
+
+        function moveAt(pageX, pageY) {
+          win.style.left = pageX - shiftX + 'px';
+          win.style.top = pageY - shiftY + 'px';
+        }
+
+        function onMouseMove(e) {
+          moveAt(e.pageX, e.pageY);
+        }
+
+        document.addEventListener('mousemove', onMouseMove);
+        document.onmouseup = () => {
+          document.removeEventListener('mousemove', onMouseMove);
+          document.onmouseup = null;
+        };
+      };
+    });
+
+    // --- Browser Navigation ---
+    function navigate() {
+      const url = document.getElementById("urlInput").value.trim();
+      const frame = document.getElementById("browserFrame");
+      frame.src = url.startsWith("http") ? url : "https://" + url;
+    }
+
+    // --- "Unblock" via iframe proxy ---
+    function aetherUnblock() {
+      const url = document.getElementById("urlInput").value.trim();
+      const frame = document.getElementById("browserFrame");
+      const cleanURL = url.startsWith("http") ? url : "https://" + url;
+
+      // Use Jina proxy for text-only access (works on school filters)
+      frame.src = "https://r.jina.ai/" + cleanURL;
+    }
+
+    // --- Terminal Commands ---
+    function handleCommand(event) {
+      if (event.key === "Enter") {
+        const input = event.target;
+        const cmd = input.value.trim();
+        const output = document.getElementById("terminalOutput");
+        let response = "";
+
+        if (cmd === "help") response = "Commands: help, about, clear";
+        else if (cmd === "about") response = "AetherOS v1.0 — Cloud-powered static OS.";
+        else if (cmd === "clear") { output.innerHTML = ""; input.value = ""; return; }
+        else response = "Unknown command: " + cmd;
+
+        output.innerHTML += `<div>> ${cmd}</div><div>${response}</div>`;
+        output.scrollTop = output.scrollHeight;
+        input.value = "";
+      }
+    }
+
+    // --- Settings ---
+    let darkMode = true;
+    function toggleTheme() {
+      darkMode = !darkMode;
+      document.body.style.background = darkMode
+        ? 'radial-gradient(circle at top right, #0d0d18, #050510 80%)'
+        : 'radial-gradient(circle at top right, #e0e4ff, #a8b3ff 80%)';
+      document.body.style.color = darkMode ? 'white' : '#222';
+    }
+  </script>
+</body>
+</html>
