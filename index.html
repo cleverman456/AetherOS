@@ -1,363 +1,488 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AetherOS | Cloud Operating System</title>
-  <link rel="icon" type="image/png" href="images/aetheros-icon.png">
-  <style>
-    /* --- Base --- */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', sans-serif;
-      user-select: none;
-    }
-    body {
-      background: radial-gradient(circle at top right, #0d0d18, #050510 80%);
-      color: white;
-      overflow: hidden;
-      height: 100vh;
-      width: 100vw;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Classroom — Assignments</title>
+<style>
+  :root{
+    --bg:#0f1720;
+    --card:#0f1726;
+    --muted:#9aa6c1;
+    --accent:#6ee7b7;
+    --glass: rgba(255,255,255,0.03);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background: linear-gradient(180deg,#071024 0%, #071022 60%), radial-gradient(circle at 20% 10%, rgba(123,47,247,0.06), transparent 10%);
+    color:#e6eef8;
+    font-family: Inter, "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px;
+  }
 
-    /* --- Desktop --- */
-    .desktop {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
+  /* Classroom page */
+  .classroom {
+    width:980px;
+    max-width:calc(100% - 48px);
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:12px;
+    padding:22px;
+    box-shadow: 0 10px 40px rgba(2,6,23,0.7);
+    border: 1px solid rgba(255,255,255,0.03);
+  }
 
-    .icon {
-      width: 80px;
-      text-align: center;
-      cursor: pointer;
-      margin: 20px;
-      display: inline-block;
-    }
+  .top {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+  }
 
-    .icon img {
-      width: 64px;
-      height: 64px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.1);
-      padding: 8px;
-      transition: transform 0.2s;
-    }
+  .title {
+    display:flex;
+    gap:12px;
+    align-items:center;
+  }
 
-    .icon:hover img {
-      transform: scale(1.1);
-    }
+  .brand {
+    background: linear-gradient(135deg,#7b2ff7,#00d4ff);
+    width:56px;height:56px;border-radius:10px;
+    display:grid;place-items:center;font-weight:700;color:#02112a;font-size:20px;box-shadow:0 6px 18px rgba(123,47,247,0.12);
+  }
 
-    .icon span {
-      display: block;
-      margin-top: 5px;
-      font-size: 14px;
-      color: #ddd;
-    }
+  h1{font-size:20px;margin:0}
+  p.sub{color:var(--muted);margin:6px 0 0;font-size:13px}
 
-    /* --- Windows --- */
-    .window {
-      position: absolute;
-      top: 100px;
-      left: 100px;
-      width: 700px;
-      height: 500px;
-      background: rgba(20, 20, 35, 0.95);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      display: none;
-      flex-direction: column;
-      overflow: hidden;
-      resize: both;
-    }
+  .assignments {
+    display:grid;grid-template-columns:1fr 320px; gap:20px; margin-top:18px;
+  }
 
-    .window-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(255,255,255,0.05);
-      padding: 8px 12px;
-      cursor: move;
-    }
+  .cards{
+    display:grid; gap:12px;
+  }
 
-    .window-header .title {
-      font-weight: bold;
-      color: #a6b8ff;
-    }
+  .card{
+    background:var(--card); padding:14px; border-radius:10px; border:1px solid rgba(255,255,255,0.02);
+    display:flex; justify-content:space-between; align-items:center;
+  }
 
-    .buttons {
-      display: flex;
-      gap: 6px;
-    }
+  .card h3{margin:0;font-size:15px}
+  .card p{margin:6px 0 0;color:var(--muted);font-size:13px}
 
-    .btn {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      cursor: pointer;
-    }
+  .sidebar{
+    background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.008));
+    padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);
+  }
 
-    .close { background: #ff5f57; }
-    .minimize { background: #febc2e; }
-    .maximize { background: #28c840; }
+  .cta {
+    margin-top:18px; display:flex; gap:10px; align-items:center;
+  }
 
-    .window-content {
-      flex: 1;
-      padding: 10px;
-      overflow: auto;
-    }
+  .btn {
+    background: linear-gradient(90deg,#7b2ff7,#00d4ff);
+    color:#02112a;padding:10px 14px;border-radius:9px;border:none;font-weight:700;cursor:pointer;box-shadow:0 8px 22px rgba(11,13,30,0.5);
+  }
 
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      border-radius: 0 0 12px 12px;
-    }
+  .btn.ghost{background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,0.03) }
 
-    /* --- Browser --- */
-    .browser-bar {
-      background: rgba(255,255,255,0.1);
-      padding: 8px;
-      display: flex;
-      gap: 8px;
-      border-radius: 8px;
-    }
+  small.hint { color:var(--muted); display:block; margin-top:8px; font-size:12px; }
 
-    .browser-bar input {
-      flex: 1;
-      padding: 6px;
-      border: none;
-      border-radius: 6px;
-      background: rgba(255,255,255,0.15);
-      color: white;
-      outline: none;
-    }
+  footer.attribution{display:flex;justify-content:space-between;align-items:center;margin-top:18px;color:var(--muted);font-size:13px}
 
-    .browser-bar button {
-      background: #2f6bff;
-      border: none;
-      color: white;
-      border-radius: 6px;
-      padding: 6px 10px;
-      cursor: pointer;
-    }
-
-    /* --- Terminal --- */
-    .terminal {
-      font-family: monospace;
-      color: #00ff99;
-      background: #000;
-      padding: 10px;
-      height: 100%;
-      overflow-y: auto;
-      border-radius: 6px;
-    }
-
-    .terminal-input {
-      width: 100%;
-      background: transparent;
-      border: none;
-      color: #00ff99;
-      font-family: monospace;
-      outline: none;
-    }
-
-    /* --- Settings --- */
-    .settings {
-      color: #ddd;
-    }
-
-    .theme-toggle {
-      background: #2f6bff;
-      color: white;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    /* --- Title --- */
-    .os-title {
-      position: absolute;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 60px;
-      font-weight: 600;
-      background: linear-gradient(90deg, #00d4ff, #7b2ff7);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 20px rgba(123,47,247,0.5);
-      animation: fadeIn 2s ease forwards;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translate(-50%, -40%); }
-      to { opacity: 1; transform: translate(-50%, -50%); }
-    }
-  </style>
+  /* responsive */
+  @media (max-width:880px){
+    .assignments{ grid-template-columns:1fr; }
+  }
+</style>
 </head>
 <body>
-  <div class="desktop">
-    <div class="os-title">AetherOS</div>
-
-    <div class="icon" onclick="openWindow('browser')">
-      <img src="images/browser.png" alt="Browser">
-      <span>Browser</span>
-    </div>
-
-    <div class="icon" onclick="openWindow('terminal')">
-      <img src="images/terminal.png" alt="Terminal">
-      <span>Terminal</span>
-    </div>
-
-    <div class="icon" onclick="openWindow('settings')">
-      <img src="images/settings.png" alt="Settings">
-      <span>Settings</span>
-    </div>
-
-    <!-- Browser Window -->
-    <div id="browser" class="window">
-      <div class="window-header">
-        <div class="title">Aether Browser</div>
-        <div class="buttons">
-          <div class="btn close" onclick="closeWindow('browser')"></div>
-          <div class="btn minimize"></div>
-          <div class="btn maximize"></div>
+  <div class="classroom" role="main" aria-label="Classroom assignments">
+    <div class="top">
+      <div class="title">
+        <div class="brand">T9</div>
+        <div>
+          <h1>Classroom — Assignments</h1>
+          <p class="sub">Today's tasks and the T9OS lab. Click below to enter the class environment.</p>
         </div>
       </div>
-      <div class="window-content">
-        <div class="browser-bar">
-          <input type="text" id="urlInput" placeholder="Enter URL (e.g., https://example.com)">
-          <button onclick="navigate()">Go</button>
-          <button onclick="aetherUnblock()">Unblock</button>
-        </div>
-        <iframe id="browserFrame" src=""></iframe>
+      <div style="text-align:right">
+        <div style="font-weight:700">Ms. Rivera</div>
+        <div style="color:var(--muted);font-size:13px">Computer Science · Period 2</div>
       </div>
     </div>
 
-    <!-- Terminal -->
-    <div id="terminal" class="window">
-      <div class="window-header">
-        <div class="title">Aether Terminal</div>
-        <div class="buttons">
-          <div class="btn close" onclick="closeWindow('terminal')"></div>
+    <div class="assignments">
+      <div class="cards">
+        <div class="card">
+          <div>
+            <h3>Assignment: Intro to T9OS</h3>
+            <p>Read the lab instructions and launch the T9OS environment.</p>
+          </div>
+          <div>
+            <button class="btn" id="goT9">Go to T9OS Class</button>
+            <small class="hint">Opens a classroom virtual OS</small>
+          </div>
+        </div>
+
+        <div class="card">
+          <div>
+            <h3>Quiz: OS Basics</h3>
+            <p>Due: Today • 11:59 PM</p>
+          </div>
+          <div><button class="btn ghost">View</button></div>
+        </div>
+
+        <div class="card">
+          <div>
+            <h3>Project: Mini Browser</h3>
+            <p>Group project — deploy a proxy-based browser.</p>
+          </div>
+          <div><button class="btn ghost">Details</button></div>
         </div>
       </div>
-      <div class="window-content">
-        <div class="terminal" id="terminalOutput">
-          <div>Welcome to AetherOS Terminal. Type 'help' for commands.</div>
+
+      <aside class="sidebar">
+        <h4 style="margin:0 0 8px 0">Classroom</h4>
+        <p style="color:var(--muted);margin:0 0 12px 0">Open the AetherOS lab to continue.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn ghost">Calendar</button>
+          <button class="btn ghost">Grades</button>
+          <button class="btn ghost">Files</button>
         </div>
-        <input type="text" class="terminal-input" id="terminalInput" placeholder=">_" onkeydown="handleCommand(event)">
-      </div>
+
+        <div style="margin-top:12px">
+          <small style="color:var(--muted)">Tip: Works best in Chrome/Edge</small>
+        </div>
+      </aside>
     </div>
 
-    <!-- Settings -->
-    <div id="settings" class="window">
-      <div class="window-header">
-        <div class="title">Settings</div>
-        <div class="buttons">
-          <div class="btn close" onclick="closeWindow('settings')"></div>
-        </div>
-      </div>
-      <div class="window-content settings">
-        <h3>Appearance</h3>
-        <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark/Light Mode</button>
-      </div>
-    </div>
+    <footer class="attribution">
+      <div>School Dashboard</div>
+      <div style="color:var(--muted)">Built with AetherOS UI</div>
+    </footer>
   </div>
 
+<script>
+/* Single-file T9OS flow:
+   - Click "Go to T9OS Class" opens about:blank window (same-origin).
+   - New window shows a boot animation, then replaces contents with T9 desktop UI.
+   - Everything is generated from this main file, desktop includes Browser that auto-falls back to PROXY_URL.
+   - Replace PROXY_URL with your deployed backend proxy endpoint (Render, etc.)
+*/
+
+const PROXY_URL = "https://aetherosproxy.onrender.com/proxy?url="; // <- REPLACE with your proxy
+
+document.getElementById("goT9").addEventListener("click", () => {
+  openT9Window();
+});
+
+function openT9Window(){
+  // open a new blank window (about:blank) so we can write into it
+  const win = window.open("about:blank", "_blank", "noopener,noreferrer,width=1100,height=700");
+  if (!win) { alert("Popup blocked: allow popups for this site to open the T9OS class."); return; }
+
+  // Boot screen HTML (silent)
+  const bootHTML = `
+  <!doctype html><html><head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>T9OS — Booting</title>
+  <style>
+    :root{--bg:#071022;--accent:linear-gradient(90deg,#7b2ff7,#00d4ff);}
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:var(--bg);font-family:Inter,system-ui,Segoe UI,Arial;color:#e8f0ff}
+    .wrap{height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px}
+    .logo{width:96px;height:96px;border-radius:14px;background:linear-gradient(135deg,#7b2ff7,#00d4ff);display:grid;place-items:center;font-weight:800;color:#02112a;font-size:28px;box-shadow:0 10px 30px rgba(11,13,30,0.6)}
+    .status{color:#9fb1d9;font-size:14px}
+    .bar {width:320px;height:10px;border-radius:999px;background:rgba(255,255,255,0.06);overflow:hidden}
+    .bar > i {display:block;height:100%;width:0;background:linear-gradient(90deg,#7b2ff7,#00d4ff);border-radius:999px;transition:width 1s linear}
+    .small{font-size:12px;color:#8ea5c9;margin-top:10px}
+  </style>
+  </head><body>
+    <div class="wrap">
+      <div class="logo">T9</div>
+      <div class="status">T9OS booting…</div>
+      <div class="bar"><i id="bootfill"></i></div>
+      <div class="small">Initializing virtual class environment</div>
+    </div>
   <script>
-    // --- Window System ---
-    function openWindow(id) {
-      document.getElementById(id).style.display = "flex";
-      bringToFront(id);
+    // animate progress
+    const fill = document.getElementById('bootfill');
+    let pct = 0;
+    const step = () => {
+      pct += Math.floor(Math.random()*20)+10;
+      if (pct > 100) pct = 100;
+      fill.style.width = pct + '%';
+      if (pct < 100) setTimeout(step, 300 + Math.random()*400);
+    };
+    step();
+  <\/script>
+  </body></html>
+  `;
+
+  // write boot screen immediately
+  win.document.open();
+  win.document.write(bootHTML);
+  win.document.close();
+
+  // After boot seconds, replace with desktop HTML. Keep delay ~ 2200-3200ms to feel realistic.
+  const bootDelay = 2200 + Math.floor(Math.random()*900);
+  setTimeout(() => {
+    writeDesktopToWindow(win);
+  }, bootDelay);
+}
+
+function writeDesktopToWindow(win) {
+  // Build full desktop HTML (T9-like clean UI). We embed the proxy URL into script.
+  const desktopHTML = `
+  <!doctype html><html><head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>T9OS — Classroom</title>
+  <style>
+    :root{
+      --bg:#071022; --card:#0f1726; --muted:#9aa6c1; --accent-a:#7b2ff7; --accent-b:#00d4ff;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:
+      radial-gradient(circle at 10% 10%, rgba(123,47,247,0.06), transparent 6%),
+      linear-gradient(180deg,#071022 0%, #06111b 60%);font-family:Inter,Segoe UI,system-ui;color:#eaf2ff}
+    .dock { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); display:flex; gap:18px; background:rgba(255,255,255,0.02); padding:12px 18px; border-radius:14px; box-shadow:0 18px 50px rgba(2,6,23,0.6); border:1px solid rgba(255,255,255,0.03)}
+    .dock .icon { width:64px; height:64px; border-radius:12px; display:grid; place-items:center; font-size:30px; cursor:pointer; user-select:none; transition:transform .15s ease; }
+    .dock .icon:hover{ transform:translateY(-6px) scale(1.05) }
+    .desktop-center{position:relative;height:100%;display:flex;align-items:center;justify-content:center;pointer-events:none}
+    .welcome-card{pointer-events:auto; width:860px; max-width:calc(100% - 48px); background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:28px; border-radius:14px; border:1px solid rgba(255,255,255,0.03); box-shadow:0 10px 40px rgba(2,6,23,0.6)}
+    .welcome-grid{display:flex;gap:20px;align-items:center}
+    .big-brand{width:88px;height:88px;border-radius:14px;background:linear-gradient(135deg,var(--accent-a),var(--accent-b));display:grid;place-items:center;font-weight:800;color:#02112a;font-size:28px}
+    .welcome h2{margin:0;font-size:20px}
+    .welcome p{color:var(--muted);margin:8px 0 0 0}
+    .quick{margin-top:16px;display:flex;gap:12px}
+    .quick button{background:transparent;border:1px solid rgba(255,255,255,0.03);padding:10px 12px;border-radius:10px;color:var(--muted);cursor:pointer}
+    /* window */
+    .app-window { position:fixed; top:8%; left:50%; transform:translateX(-50%); width:84%; height:72%; background:#071022; border-radius:12px; box-shadow:0 24px 60px rgba(2,6,23,0.7); overflow:hidden; display:none; flex-direction:column; border:1px solid rgba(255,255,255,0.03) }
+    .win-top{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:8px 12px; display:flex; gap:10px; align-items:center}
+    .controls{display:flex;gap:8px}
+    .ctrl { width:12px;height:12px;border-radius:50% }
+    .close{background:#ff5f57} .min{background:#febc2e} .max{background:#28c840}
+    #urlInput{flex:1;padding:8px;border-radius:8px;border:none;background:rgba(255,255,255,0.02);color:#eaf2ff;outline:none}
+    .btn{padding:6px 8px;border-radius:8px;border:none;background:linear-gradient(90deg,var(--accent-a),var(--accent-b));color:#02112a;cursor:pointer}
+    #browserFrame{flex:1;border:none;width:100%}
+    .toolbar{display:flex;gap:8px;align-items:center; padding:8px;border-bottom:1px solid rgba(255,255,255,0.02)}
+    /* simple sidebar */
+    .sidebar{position:fixed;left:28px;top:28px;background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02)}
+    .sidebar button{display:block;margin-bottom:8px;background:transparent;color:var(--muted);border:none;cursor:pointer}
+    /* history list */
+    .history-list{max-height:220px;overflow:auto;padding:8px}
+    .history-item{padding:8px;border-radius:8px;background:rgba(255,255,255,0.01);margin-bottom:6px;cursor:pointer;color:var(--muted);font-size:13px}
+    .history-item:hover{background:rgba(255,255,255,0.02);color:#eaf2ff}
+  </style>
+  </head><body>
+    <div class="desktop-center">
+      <div class="welcome-card" id="welcomeCard" role="dialog" aria-label="T9 Desktop">
+        <div class="welcome-grid">
+          <div class="big-brand">T9</div>
+          <div class="welcome">
+            <h2>Welcome to T9Class</h2>
+            <p>Clean virtual desktop for class activities. Open Browser to start web tasks.</p>
+            <div class="quick">
+              <button id="openApps">Apps</button>
+              <button id="openGames">Games</button>
+              <button id="openBrowserBtn">Open Browser</button>
+              <button id="openSettings">Settings</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- small sidebar -->
+    <div class="sidebar">
+      <div style="font-weight:700;margin-bottom:8px">T9Class</div>
+      <button id="homeBtn">Home</button>
+      <button id="historyBtn">History</button>
+    </div>
+
+    <!-- dock -->
+    <div class="dock" id="dock">
+      <div class="icon" title="Apps" id="dockApps">🗂️</div>
+      <div class="icon" title="Games" id="dockGames">🎮</div>
+      <div class="icon" title="Browser" id="dockBrowser">🌐</div>
+      <div class="icon" title="Settings" id="dockSettings">⚙️</div>
+    </div>
+
+    <!-- Browser window (app-window) -->
+    <div class="app-window" id="browserWin" role="application" aria-label="Browser Window">
+      <div class="win-top">
+        <div class="controls">
+          <div class="ctrl close" id="winClose"></div>
+          <div class="ctrl min"></div>
+          <div class="ctrl max"></div>
+        </div>
+        <div style="flex:1"></div>
+        <div style="font-size:13px;color:var(--muted)">T9 Browser</div>
+      </div>
+
+      <div class="toolbar">
+        <input id="urlInput" placeholder="Type a URL or search, press Enter" />
+        <button class="btn" id="goBtn">Go</button>
+        <button class="btn" id="homeBtn2">Home</button>
+      </div>
+      <iframe id="browserFrame" src=""></iframe>
+    </div>
+
+    <!-- History modal -->
+    <div id="historyModal" style="display:none; position:fixed; right:32px; top:32px; width:340px; background:rgba(255,255,255,0.02); padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.02)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-weight:700">History</div>
+        <button id="closeHist" style="background:transparent;color:var(--muted);border:none;cursor:pointer">✖</button>
+      </div>
+      <div class="history-list" id="historyList"></div>
+    </div>
+
+  <script>
+    // Injected PROXY constant
+    const PROXY = ${JSON.stringify(PROXY_URL)};
+
+    // Desktop interactions
+    const welcomeCard = document.getElementById('welcomeCard');
+    const browserWin = document.getElementById('browserWin');
+    const urlInput = document.getElementById('urlInput');
+    const browserFrame = document.getElementById('browserFrame');
+
+    // Dock/buttons
+    const openBrowserBtn = document.getElementById('openBrowserBtn');
+    const dockBrowser = document.getElementById('dockBrowser');
+    const winClose = document.getElementById('winClose');
+    const goBtn = document.getElementById('goBtn');
+    const homeBtn2 = document.getElementById('homeBtn2');
+    const historyBtn = document.getElementById('historyBtn');
+    const historyModal = document.getElementById('historyModal');
+    const historyList = document.getElementById('historyList');
+    const closeHist = document.getElementById('closeHist');
+
+    function showBrowser(){
+      welcomeCard.style.display='none';
+      browserWin.style.display='flex';
+      urlInput.focus();
+    }
+    function hideBrowser(){
+      browserWin.style.display='none';
+      welcomeCard.style.display='block';
+      browserFrame.src='';
     }
 
-    function closeWindow(id) {
-      document.getElementById(id).style.display = "none";
-    }
+    openBrowserBtn.addEventListener('click', showBrowser);
+    dockBrowser.addEventListener('click', showBrowser);
+    winClose.addEventListener('click', hideBrowser);
+    goBtn.addEventListener('click', ()=>{ handleNavigate(urlInput.value); });
+    homeBtn2.addEventListener('click', ()=>{ hideBrowser(); });
 
-    let zIndex = 10;
-    function bringToFront(id) {
-      const el = document.getElementById(id);
-      el.style.zIndex = ++zIndex;
-    }
-
-    // --- Dragging Windows ---
-    document.querySelectorAll('.window').forEach(win => {
-      const header = win.querySelector('.window-header');
-      header.onmousedown = function(e) {
-        bringToFront(win.id);
-        let shiftX = e.clientX - win.getBoundingClientRect().left;
-        let shiftY = e.clientY - win.getBoundingClientRect().top;
-
-        function moveAt(pageX, pageY) {
-          win.style.left = pageX - shiftX + 'px';
-          win.style.top = pageY - shiftY + 'px';
-        }
-
-        function onMouseMove(e) {
-          moveAt(e.pageX, e.pageY);
-        }
-
-        document.addEventListener('mousemove', onMouseMove);
-        document.onmouseup = () => {
-          document.removeEventListener('mousemove', onMouseMove);
-          document.onmouseup = null;
-        };
-      };
+    // Enter to navigate
+    urlInput.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter'){ e.preventDefault(); handleNavigate(urlInput.value); }
     });
 
-    // --- Browser Navigation ---
-    function navigate() {
-      const url = document.getElementById("urlInput").value.trim();
-      const frame = document.getElementById("browserFrame");
-      frame.src = url.startsWith("http") ? url : "https://" + url;
+    // Auto navigation handler
+    function handleNavigate(raw){
+      const input = (raw||'').trim();
+      if(!input) return;
+      const final = formatInput(input);
+      saveHistory(final);
+
+      // Google special: if input intended Google search (or direct google.com)
+      if(final.includes('google.com')){
+        // point to proxy google to ensure search works if blocked
+        browserFrame.src = PROXY + encodeURIComponent('https://www.google.com');
+        return;
+      }
+
+      // Try direct load then fallback
+      browserFrame.src = final;
+      // After timeout, check and fallback
+      setTimeout(()=>{ tryFallback(final); }, 2200);
     }
 
-    // --- "Unblock" via iframe proxy ---
-    function aetherUnblock() {
-      const url = document.getElementById("urlInput").value.trim();
-      const frame = document.getElementById("browserFrame");
-      const cleanURL = url.startsWith("http") ? url : "https://" + url;
-
-      // Use Jina proxy for text-only access (works on school filters)
-      frame.src = "https://r.jina.ai/" + cleanURL;
+    function formatInput(text){
+      // if looks like url (has scheme or starts with www), make full url
+      if(/^[a-zA-Z]+:\\/\\//.test(text) || text.startsWith('www.')){
+        return text.startsWith('http') ? text : 'https://' + text;
+      }
+      // treat as search query
+      return 'https://www.google.com/search?q=' + encodeURIComponent(text);
     }
 
-    // --- Terminal Commands ---
-    function handleCommand(event) {
-      if (event.key === "Enter") {
-        const input = event.target;
-        const cmd = input.value.trim();
-        const output = document.getElementById("terminalOutput");
-        let response = "";
-
-        if (cmd === "help") response = "Commands: help, about, clear";
-        else if (cmd === "about") response = "AetherOS v1.0 — Cloud-powered static OS.";
-        else if (cmd === "clear") { output.innerHTML = ""; input.value = ""; return; }
-        else response = "Unknown command: " + cmd;
-
-        output.innerHTML += `<div>> ${cmd}</div><div>${response}</div>`;
-        output.scrollTop = output.scrollHeight;
-        input.value = "";
+    function tryFallback(final){
+      try{
+        const doc = browserFrame.contentDocument || browserFrame.contentWindow.document;
+        if(!doc || !doc.body || doc.body.innerHTML.length === 0){
+          browserFrame.src = PROXY + encodeURIComponent(final);
+        }
+      }catch(e){
+        // cross-origin access will throw for many sites; treat as blocked and use proxy
+        browserFrame.src = PROXY + encodeURIComponent(final);
       }
     }
 
-    // --- Settings ---
-    let darkMode = true;
-    function toggleTheme() {
-      darkMode = !darkMode;
-      document.body.style.background = darkMode
-        ? 'radial-gradient(circle at top right, #0d0d18, #050510 80%)'
-        : 'radial-gradient(circle at top right, #e0e4ff, #a8b3ff 80%)';
-      document.body.style.color = darkMode ? 'white' : '#222';
+    // History persistence (localStorage)
+    function saveHistory(url){
+      let h = JSON.parse(localStorage.getItem('t9_history') || '[]');
+      h = h.filter(u => u !== url); // dedupe
+      h.unshift(url);
+      if(h.length > 50) h.pop();
+      localStorage.setItem('t9_history', JSON.stringify(h));
     }
-  </script>
+    function loadHistory(){
+      historyList.innerHTML = '';
+      const h = JSON.parse(localStorage.getItem('t9_history') || '[]');
+      if(h.length === 0){ historyList.innerHTML = '<div style="color:var(--muted)">No history yet</div>'; return; }
+      h.forEach(u => {
+        const el = document.createElement('div');
+        el.className = 'history-item';
+        el.textContent = u;
+        el.onclick = ()=>{ showBrowser(); urlInput.value = u; handleNavigate(u); historyModal.style.display='none'; }
+        historyList.appendChild(el);
+      });
+    }
+
+    historyBtn.addEventListener('click', ()=>{
+      loadHistory();
+      historyModal.style.display = 'block';
+    });
+    closeHist.addEventListener('click', ()=>historyModal.style.display='none');
+
+    // dock quicks for other icons (no-op placeholders)
+    document.getElementById('dockApps').addEventListener('click', ()=> alert('Apps placeholder — coming soon.'));
+    document.getElementById('dockGames').addEventListener('click', ()=> alert('Games placeholder — coming soon.'));
+    document.getElementById('dockSettings').addEventListener('click', ()=> alert('Settings placeholder — coming soon.'));
+    document.getElementById('openGames').addEventListener('click', ()=> alert('Games placeholder — coming soon.'));
+    document.getElementById('openApps').addEventListener('click', ()=> alert('Apps placeholder — coming soon.'));
+    document.getElementById('openSettings').addEventListener('click', ()=> alert('Settings placeholder — coming soon.'));
+
+    // keyboard shortcut: ESC closes browser
+    window.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ hideBrowser(); historyModal.style.display='none'; } });
+
+    // focus first input initially
+    urlInput.addEventListener('focus', ()=>{ urlInput.select(); });
+  <\/script>
+  </body></html>
+  `;
+
+  // write to new window
+  try {
+    win.document.open();
+    win.document.write(desktopHTML);
+    win.document.close();
+    // focus new window
+    win.focus();
+  } catch (err) {
+    // fail safe: if writing is blocked, at least navigate to data URL containing desktop (rare)
+    console.error('Could not write desktop into new window:', err);
+    win.location = 'about:blank';
+  }
+}
+</script>
 </body>
 </html>
