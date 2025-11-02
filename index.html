@@ -25,8 +25,6 @@ body{
   justify-content:center;
   padding:28px;
 }
-
-/* Classroom page */
 .classroom {
   width:980px;
   max-width:calc(100% - 48px);
@@ -120,12 +118,14 @@ footer.attribution{display:flex;justify-content:space-between;align-items:center
 
 <script>
 const PROXY_URL = "https://aetherosproxy.onrender.com/proxy?url=";
+
 document.getElementById("goAether").addEventListener("click", ()=>openAetherWindow());
 
 function openAetherWindow(){
   const win = window.open("", "_blank", "width=1100,height=700,noopener,noreferrer");
   if(!win){ alert("Popup blocked: allow popups for AetherOS Class."); return; }
 
+  // Boot screen
   const bootHTML = `
   <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>AetherOS Boot</title>
@@ -141,13 +141,15 @@ function openAetherWindow(){
   <div class="bar"><i id="bootfill"></i></div>
   <script>
     const fill=document.getElementById('bootfill'); let pct=0;
-    const step=()=>{ pct+=Math.floor(Math.random()*20)+10; if(pct>100)pct=100; fill.style.width=pct+'%'; if(pct<100)setTimeout(step,300+Math.random()*400); };
+    const step=()=>{ pct+=Math.floor(Math.random()*20)+10; if(pct>100)pct=100; fill.style.width=pct+'%'; if(pct<100)setTimeout(step,300+Math.random()*400); else { setTimeout(()=>{ window.location.reload(); },500); } };
     step();
   </script>
   </body></html>
   `;
   win.document.open(); win.document.write(bootHTML); win.document.close();
-  setTimeout(()=>loadDesktop(win), 2500 + Math.random()*800);
+
+  // Load desktop after a delay
+  setTimeout(()=>loadDesktop(win), 3500);
 }
 
 function loadDesktop(win){
@@ -176,8 +178,6 @@ function loadDesktop(win){
     .btn{padding:6px 8px;border-radius:8px;border:none;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#02112a;cursor:pointer}
     .toolbar{display:flex;gap:8px;align-items:center; padding:8px;border-bottom:1px solid rgba(255,255,255,0.02)}
     iframe{flex:1;border:none;width:100%;}
-    .sidebar{position:fixed;left:28px;top:28px;background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02)}
-    .sidebar button{display:block;margin-bottom:8px;background:transparent;color:var(--muted);border:none;cursor:pointer}
   </style>
   </head><body>
     <div class="desktop-center">
@@ -196,7 +196,6 @@ function loadDesktop(win){
       </div>
     </div>
 
-    <!-- dock -->
     <div class="dock">
       <div class="icon" id="dockApps">🗂️</div>
       <div class="icon" id="dockGames">🎮</div>
@@ -277,7 +276,6 @@ function loadDesktop(win){
     const browserFrame = document.getElementById('browserFrame');
 
     function hideAll(){ appsWin.style.display='none'; gamesWin.style.display='none'; browserWin.style.display='none'; settingsWin.style.display='none'; welcomeCard.style.display='none'; }
-
     function showWin(win){ hideAll(); win.style.display='flex'; }
 
     document.getElementById('openApps').addEventListener('click', ()=>showWin(appsWin));
@@ -290,19 +288,14 @@ function loadDesktop(win){
     document.getElementById('dockBrowser').addEventListener('click', ()=>showWin(browserWin));
     document.getElementById('dockSettings').addEventListener('click', ()=>showWin(settingsWin));
 
-    document.getElementById('appsClose').addEventListener('click', ()=>welcomeCard.style.display='block', appsWin.style.display='none');
-    document.getElementById('gamesClose').addEventListener('click', ()=>welcomeCard.style.display='block', gamesWin.style.display='none');
-    document.getElementById('browserClose').addEventListener('click', ()=>welcomeCard.style.display='block', browserWin.style.display='none');
-    document.getElementById('settingsClose').addEventListener('click', ()=>welcomeCard.style.display='block', settingsWin.style.display='none');
+    document.getElementById('appsClose').addEventListener('click', ()=>{ appsWin.style.display='none'; welcomeCard.style.display='block'; });
+    document.getElementById('gamesClose').addEventListener('click', ()=>{ gamesWin.style.display='none'; welcomeCard.style.display='block'; });
+    document.getElementById('browserClose').addEventListener('click', ()=>{ browserWin.style.display='none'; welcomeCard.style.display='block'; });
+    document.getElementById('settingsClose').addEventListener('click', ()=>{ settingsWin.style.display='none'; welcomeCard.style.display='block'; });
 
     document.getElementById('goBtn').addEventListener('click', ()=>{ navigateBrowser(urlInput.value); });
     urlInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); navigateBrowser(urlInput.value); }});
-
-    function navigateBrowser(raw){
-      if(!raw) return;
-      let url = raw.startsWith('http') ? raw : 'https://'+raw;
-      browserFrame.src = url;
-    }
+    function navigateBrowser(raw){ if(!raw) return; let url = raw.startsWith('http')? raw:'https://'+raw; browserFrame.src=url; }
 
     document.getElementById('themeToggle').addEventListener('click', ()=>{
       document.body.style.background = document.body.style.background.includes('#fff') ? 'radial-gradient(circle at 10% 10%, rgba(123,47,247,0.06),transparent 6%),linear-gradient(180deg,#071022 0%,#06111b 60%)' : '#fff';
