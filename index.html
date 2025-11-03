@@ -148,7 +148,6 @@ function openAetherWindow(){
   `;
   win.document.open(); win.document.write(bootHTML); win.document.close();
 
-  // Load desktop after a delay
   setTimeout(()=>loadDesktop(win), 3500);
 }
 
@@ -178,6 +177,9 @@ function loadDesktop(win){
     .btn{padding:6px 8px;border-radius:8px;border:none;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#02112a;cursor:pointer}
     .toolbar{display:flex;gap:8px;align-items:center; padding:8px;border-bottom:1px solid rgba(255,255,255,0.02)}
     iframe{flex:1;border:none;width:100%;}
+    .games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;padding:12px;}
+    .game-card{background:rgba(255,255,255,0.02);border-radius:12px;padding:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .2s ease;}
+    .game-card:hover{transform:scale(1.05);}
   </style>
   </head><body>
     <div class="desktop-center">
@@ -203,20 +205,6 @@ function loadDesktop(win){
       <div class="icon" id="dockSettings">⚙️</div>
     </div>
 
-    <!-- Apps window -->
-    <div class="app-window" id="appsWin">
-      <div class="win-top">
-        <div class="controls">
-          <div class="ctrl close" id="appsClose"></div>
-          <div class="ctrl min"></div>
-          <div class="ctrl max"></div>
-        </div>
-        <div style="flex:1"></div>
-        <div style="font-size:13px;color:var(--muted)">Apps</div>
-      </div>
-      <iframe src="${PROXY_URL + encodeURIComponent('https://example.com/apps')}"></iframe>
-    </div>
-
     <!-- Games window -->
     <div class="app-window" id="gamesWin">
       <div class="win-top">
@@ -228,83 +216,49 @@ function loadDesktop(win){
         <div style="flex:1"></div>
         <div style="font-size:13px;color:var(--muted)">Games</div>
       </div>
-      <iframe src="${PROXY_URL + encodeURIComponent('https://example.com/games')}"></iframe>
+      <div class="games-grid" id="gamesGrid"></div>
+      <iframe id="gameFrame" style="display:none;"></iframe>
     </div>
 
-    <!-- Browser window -->
-    <div class="app-window" id="browserWin">
-      <div class="win-top">
-        <div class="controls">
-          <div class="ctrl close" id="browserClose"></div>
-          <div class="ctrl min"></div>
-          <div class="ctrl max"></div>
-        </div>
-        <div style="flex:1"></div>
-        <div style="font-size:13px;color:var(--muted)">Browser</div>
-      </div>
-      <div class="toolbar">
-        <input id="urlInput" placeholder="Enter URL or search" />
-        <button class="btn" id="goBtn">Go</button>
-      </div>
-      <iframe id="browserFrame" src=""></iframe>
-    </div>
+    <script>
+      const welcomeCard = document.getElementById('welcomeCard');
+      const gamesWin = document.getElementById('gamesWin');
+      const gamesClose = document.getElementById('gamesClose');
+      const gamesGrid = document.getElementById('gamesGrid');
+      const gameFrame = document.getElementById('gameFrame');
 
-    <!-- Settings window -->
-    <div class="app-window" id="settingsWin">
-      <div class="win-top">
-        <div class="controls">
-          <div class="ctrl close" id="settingsClose"></div>
-          <div class="ctrl min"></div>
-          <div class="ctrl max"></div>
-        </div>
-        <div style="flex:1"></div>
-        <div style="font-size:13px;color:var(--muted)">Settings</div>
-      </div>
-      <div style="padding:12px;color:var(--muted)">
-        <button id="themeToggle" class="btn" style="margin-bottom:8px;">Toggle Dark/Light Theme</button>
-        <button id="fullscreenBtn" class="btn">Fullscreen</button>
-      </div>
-    </div>
+      function hideAll(){ welcomeCard.style.display='none'; gamesWin.style.display='none'; }
+      function showWin(win){ hideAll(); win.style.display='flex'; gameFrame.style.display='none'; gamesGrid.style.display='grid'; }
 
-  <script>
-    const welcomeCard = document.getElementById('welcomeCard');
-    const appsWin = document.getElementById('appsWin');
-    const gamesWin = document.getElementById('gamesWin');
-    const browserWin = document.getElementById('browserWin');
-    const settingsWin = document.getElementById('settingsWin');
-    const urlInput = document.getElementById('urlInput');
-    const browserFrame = document.getElementById('browserFrame');
+      document.getElementById('openGames').addEventListener('click', ()=>showWin(gamesWin));
+      document.getElementById('dockGames').addEventListener('click', ()=>showWin(gamesWin));
+      gamesClose.addEventListener('click', ()=>{ gamesWin.style.display='none'; welcomeCard.style.display='block'; });
 
-    function hideAll(){ appsWin.style.display='none'; gamesWin.style.display='none'; browserWin.style.display='none'; settingsWin.style.display='none'; welcomeCard.style.display='none'; }
-    function showWin(win){ hideAll(); win.style.display='flex'; }
+      // Example games list
+      const games = [
+        {name:"Tetris", url:"https://tetris.com/play-tetris"},
+        {name:"Snake", url:"https://playsnake.org/"},
+        {name:"Pacman", url:"https://www.retrogames.cc/embed/23160-pacman-html5.html"}
+      ];
 
-    document.getElementById('openApps').addEventListener('click', ()=>showWin(appsWin));
-    document.getElementById('openGames').addEventListener('click', ()=>showWin(gamesWin));
-    document.getElementById('openBrowserBtn').addEventListener('click', ()=>showWin(browserWin));
-    document.getElementById('openSettings').addEventListener('click', ()=>showWin(settingsWin));
-
-    document.getElementById('dockApps').addEventListener('click', ()=>showWin(appsWin));
-    document.getElementById('dockGames').addEventListener('click', ()=>showWin(gamesWin));
-    document.getElementById('dockBrowser').addEventListener('click', ()=>showWin(browserWin));
-    document.getElementById('dockSettings').addEventListener('click', ()=>showWin(settingsWin));
-
-    document.getElementById('appsClose').addEventListener('click', ()=>{ appsWin.style.display='none'; welcomeCard.style.display='block'; });
-    document.getElementById('gamesClose').addEventListener('click', ()=>{ gamesWin.style.display='none'; welcomeCard.style.display='block'; });
-    document.getElementById('browserClose').addEventListener('click', ()=>{ browserWin.style.display='none'; welcomeCard.style.display='block'; });
-    document.getElementById('settingsClose').addEventListener('click', ()=>{ settingsWin.style.display='none'; welcomeCard.style.display='block'; });
-
-    document.getElementById('goBtn').addEventListener('click', ()=>{ navigateBrowser(urlInput.value); });
-    urlInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); navigateBrowser(urlInput.value); }});
-    function navigateBrowser(raw){ if(!raw) return; let url = raw.startsWith('http')? raw:'https://'+raw; browserFrame.src=url; }
-
-    document.getElementById('themeToggle').addEventListener('click', ()=>{
-      document.body.style.background = document.body.style.background.includes('#fff') ? 'radial-gradient(circle at 10% 10%, rgba(123,47,247,0.06),transparent 6%),linear-gradient(180deg,#071022 0%,#06111b 60%)' : '#fff';
-    });
-    document.getElementById('fullscreenBtn').addEventListener('click', ()=>{ if(document.fullscreenElement){ document.exitFullscreen(); }else{ document.documentElement.requestFullscreen(); }});
-  </script>
+      // Populate game grid
+      games.forEach(game=>{
+        const card=document.createElement('div');
+        card.className='game-card';
+        card.innerText=game.name;
+        card.addEventListener('click', ()=>{
+          gamesGrid.style.display='none';
+          gameFrame.style.display='block';
+          gameFrame.src=PROXY_URL+encodeURIComponent(game.url);
+        });
+        gamesGrid.appendChild(card);
+      });
+    </script>
   </body></html>
   `;
-  win.document.open(); win.document.write(desktopHTML); win.document.close();
+  win.document.open();
+  win.document.write(desktopHTML);
+  win.document.close();
   win.focus();
 }
 </script>
